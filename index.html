@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>TCR云盘</title>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="dist/css/flat-ui.css"/>
+		<link rel="stylesheet" type="text/css" href="dist/css/demo.css"/>
+		<link rel="stylesheet" type="text/css" href="css/wholeEdit.css"/>
+		<link rel="stylesheet" type="text/css" href="css/tcrMainbody.css"/>
+		<link rel="stylesheet" type="text/css" href="css/tcrHeadbody.css"/>
+	</head>
+	<body unselectable="on" onselectstart="return false;" style="-moz-user-select:none;">
+	<!--<body onbeforeunload="return '真的要关闭此窗口吗?'">-->
+	<!--<body onbeforeunload="globalOp.directLogout()">-->
+		<div id="App">
+			<div id="prompt_notice" style="">
+				<div>
+					<p>注册成功</p>
+					<input type="button" id="promptNotice" value="确定"/>
+				</div>
+			</div>
+			<div id="preloading">
+				<div>
+					<img src="img/login.gif">
+					<p>正在加载.....</p>
+				</div>
+			</div>
+			<div id="preloadingNull">
+				<div>
+					<img src="img/login.gif">
+					<p>正在加载.....</p>
+				</div>
+			</div>
+			<tcr-head v-bind:message="loginState"></tcr-head>
+			<tcr-mainbody :message="loginState"
+				:filestyle="fileCss"
+				:array="fileList"
+				:user="userInfo"
+				:updownlist="upDownList">
+			</tcr-mainbody>
+		</div>
+		<template id="headbody" class="hide">
+			<div id="headbody_content">
+				<div id="logo" >
+					<img @click="loadings" src="img/tcr_logo.png" style="display: inline-block;"/>
+				</div>
+				<div id="Modular" v-if="personal">
+					<div id="userinfo_file" @click="fontcolor($event)"><router-link to="/home">文件</router-link></div>
+					<div id="userinfo_data" @click="fontcolor($event)"><router-link to="/datas">数据</router-link></div>
+				</div>
+				<div id="userinfo" v-if="personal">
+					<div id="userinfo_child"><img src="img/share.png"/>共享</div>
+					<div id="userinfo_set"><img src="img/set.png"/>设置</div>
+					<div id="userinfo_name" @click="userName"><router-link to="/about"><img src="img/user.png"/>{{globalData.userInfo.username}}</router-link></div>
+					<div id="userinfo_Logout" @click="logout"><a><img src="img/quit.png"/>退出</a></div>
+				</div>
+			</div>
+		</template>
+		<template id="mainbody">
+			<div id="mainbody_content">
+				<div id="mainbody_login" v-if="!personal">
+					<div id="login_top">用户登录</div>
+					<span id="endValidata" @click="endValidata">×</span>
+					<div id="login_middle">
+						<span id="gainCue">点击验证</span>
+						<div class="">
+							<span>用户名：</span>
+							<input type="text" v-model='loginName' />
+						</div>
+						<div style="position: relative; left: -110px;" class="">
+							<span>密码：</span>
+							<input style="width: 378px;" id="password" type="password" v-model='loginPassword' />
+						</div>
+						<div id="verCode">
+							<span>验证：</span>
+							<input id="verifyInput"  type="text" v-model='code' value="" />
+							<canvas id="myVerification" width='90' height='36'>
+								您的浏览器不支持canvas，请换个浏览器试试
+							</canvas>
+						</div>
+						<div class="login_means">
+							<span>登录方式：</span>
+							<label>oss<input type="radio" v-model="loginType" value="oss"/></label>  
+							<label>location<input type="radio" v-model="loginType" value="location"/></label>  
+						</div>
+					</div>
+					<div id="login_bottom">
+						<span id="login_bottom_memory">
+							<span id="">记住用户</span>
+							<input type="checkbox" style="margin: 4px 5px;" value="login_keyOK" id="login_key" />
+						</span>
+						<router-link to="/home"><input type="button" @click="login" id="login" name="" value="登录" /></router-link>
+						<input type="button" id="login_register" @click="registerFrame" value="注册" />
+						<div id="login_forget" @click="forget">忘记密码？</div>
+					</div>
+					<div id="forgot_password">
+						<ul id="catalog_forgot">
+							<li class="forgotActive">账号验证</li>
+							<li>重置密码</li>
+						</ul>
+						<div id="userVerification">
+							<div class="form-group">
+				            	<input type="text" class="form-control login-field" value="" placeholder="用户名" id="validate_name" />
+				            </div>
+				            <input type="button" @click="goValidate" id="goValidate" value="获取验证" />
+				            <div class="form-group">
+				            	<input type="text" class="form-control login-field" value="" placeholder="验证码" id="validate_num" />
+				            	<p>提示：需区分大小写</p>
+				            </div>
+				            <input type="button" @click="okValidate" id="okValidate" value="确认" />
+						</div>
+			            <div id="forgotPassword">
+			            	
+			            </div>
+					</div>
+					<div id="loginRegister">
+						<div id="loginRegister_num1">
+							<div id="">
+								<span>邀请ID：</span><input type="text" style="color: white;" id="newRegisterID" value="" /><span id="cueID"></span>
+							</div>
+							<input type="button" @click="loginRegisterNext" value="下一步" />
+						</div>
+						<div id="loginRegister_num2">
+							<div id="">
+								<span>用户名：</span>
+								<input type="text" @blur="cursorUser" id="newRegisterUser" value="" /><span>长度应为5~12位(区分大小写)</span>
+							</div>
+							<div id="">
+								<span>密码：</span>
+								<input @blur="cursorpassword" type="password" id="newRegisterPassword" value="" />
+								<span style="color: red;"></span>
+							</div>
+							<div id="">
+								<span>重复密码：</span>
+								<input @blur="cursorpasswords" type="password" id="newRegisterPasswords" value="" />
+								<span style="color: red;"></span>
+							</div>
+							<div id="">
+								<span>姓名：</span>
+								<input type="text" id="newRegisterName" value="" />
+							</div>
+							<div id="registerSex" style="margin: 0 calc( 52% - 0px) 0 0;">
+								<span>性别：</span>
+								<label for="man">男</label>
+								<input type="radio" name="registerSex" checked id="man" value="男" />
+								<label for="women">女</label>
+								<input type="radio" name="registerSex" id="women" value="女"/>
+							</div>
+							<div id="newPhoneConfirm">
+								<span>电话：</span>
+								<input type="text" id="newRegisterPhone" value="" />
+								<input type="button" @click="phoneConfirm" id="phoneConfirm" value="发送验证" style="width: 97px; margin-left: 15px;" />
+							</div>
+							<div id="">
+								<input type="text" placeholder="验证码" disabled="disabled" id="phoneConfirmText" value="" />
+							</div>
+							<input type="button" id="registerName" @click="registerName" value="注册"/>
+						</div>
+					</div>
+				</div>
+				<router-view :username="users"
+					:filestyle="filestyle" 
+					:arrayss="arrays" 
+					:personals="personal"
+					:updownlist="updownlist">
+				</router-view>
+			</div>
+		</template>
+		<template id="homes">
+			<div id="mainbody_look" v-if="personals">
+				<div id="mainbody_function">
+					<ul>
+						<li id="function_retreat" @click="backfile"><img src="img/left.png"/></li>
+						<li id="function_forward" @click="gofile"><img src="img/right.png"/></li>
+						<li id="function_upward" @click="upfile"><img src="img/top.png"/></li>
+						<li id="function_refresh" @click="renovate"><img src="img/new.png"/></li>
+						<li id="function_homepage" @click="homes"><img src="img/homepage.png"/></li>
+						<li style="width: calc( 85% - 310px);">
+							<div id="addressClickLimit">
+								<div id="addressClick"></div>
+							</div>
+							<input @focus="adddres_focus" @blur="adddres_blur" id="function_address" v-model="addressll()" value="" />
+						</li>
+						<li style="width: 15%;">
+							<input type="text" @blur="searchs" placeholder="搜索" id="function_search" value="" />
+							<img @click="searchs" style="position: relative;float: right;margin: -42px -4px 0 0px;width: 36px;" src="img/search.png"/>
+						</li>
+						<li id="function_enter" @click="jumpAddress"><img src="img/enter.png"/></li>
+					</ul>
+				</div>
+				<div id="mainbody_operation">
+					<ul>
+						<li id="operation_upload" @click="uploadOpen"><img style="width: 34px;" src="img/upload.png"/>上传</li>
+						<div id="uploadFile">
+							<span @click="uploadClose">×</span>
+							<span>选择上传类型：</span>
+							<div>
+								文件
+								<input @click="upload" multiple="multiple" type="file" id="upFile" value="" />
+							</div>
+							<div>
+								文件夹
+								<input @click="uploadmany" style="top:124px ;" webkitdirectory type="file" id="uploadmany" value="" />
+							</div>
+						</div>
+						<li id="operation_new" @click="newfile"><img src="img/newfile.png"/>新建目录</li>
+						<li id="operation_select" style="padding: inherit; width: 114px;text-align: center;line-height: 46px;" @click="whole_opt">多文件选择</li>
+						<li id="operation_download" @click="getFile"><img src="img/download.png"/>下载</li>
+						<li id="operation_copy" @click="copyFile"><img style="width: 27px;" src="img/copy.png"/>复制</li>
+						<li id="operation_shear" @click="shearFile"><img style="width: 27px;" src="img/shear.png"/>剪切</li>
+						<li id="operation_open" style="padding: 4px 24px 4px 24px;" @click="openFile">打开</li>
+						<li id="operation_many" style="padding-right: 11px;" @click="manyShow">更多<img src="img/option.png"/></li>
+						<span id="operation_function" @click="functionFile"><img style="margin: 0;" src="img/function.png"/></span>
+					</ul>
+					<!--<div id="operation_fileInfo" class="hide">
+						<div id="operation_delete" @click=""></div>
+						<div id="operation_paste" @click="">粘贴</div>
+						<div id="operation_newName" @click="">重命名</div>
+						<div id="operation_share">共享</div>
+					</div>-->
+					<div id="operation_manys" class="hide">
+						<div id="operation_delete" @click="deletes">删除</div>
+						<div id="operation_paste" @click="pastesFile">粘贴</div>
+						<div id="operation_newName" @click="renameToggle">重命名</div>
+						<div id="operation_share">共享</div>
+					</div>
+				</div>
+				<div id="rename_box">
+					<span>重命名（加后缀）：</span>
+					<input type="text"  id="rename_text" value="" /><br>
+					<input type="button" @click="renameOK" id="rename_ok" value="确定" />
+					<input type="button" @click="renameCancel" id="rename_cancel" value="取消" />
+				</div>
+				<div id="new_box">
+					<span>文件夹名：</span>
+					<input type="text"  id="new_text" value="" /><br>
+					<input type="button" @click="newOK" id="choose_ok" value="确定" />
+					<input type="button" @click="newCancel" id="choose_cancel" value="取消" />
+				</div>
+				<div id="mainbody_file">
+					<div class="gradient"></div>
+					<div id="detailedInfo">
+						<span @click="detailedInfoName">名称</span>
+						<span @click="detailedInfoDate">修改日期</span>
+						<span @click="detailedInfoType">类型</span>
+						<span @click="detailedInfoSize">大小</span>
+					</div>
+					<ul id="filefilefile">
+						<li v-for="(data,keys,index) in arrayss" v-bind:class="filestyle" @dblclick="openFile(keys)" @click="choose(keys,data,event)" >
+							<img :src="data.iconPath" alt=""/>
+							<span>{{data.name}}</span>
+							<img class="inputs" src="img/ic_check_false.png"/>
+							<span>{{fileTypes(data.type)}}</span>
+							<span>{{fileDate(data.date)}}</span>
+							<span>{{fileSize(data.size)}}</span>
+						</li>
+						<!--<li v-for="(data,keys,index) in arrayss" v-bind:class="filestyle" @dblclick="openFile(keys)" @click="choose(keys,data)" v-bind:class="{isblue:keys==qwert}" ><img :src="data.iconPath" alt=""/><span>{{data.name}}</span><img class="inputs" src="img/ic_check_false.png"/><br /><span>{{data.type}}</span></li>-->
+					</ul>
+				</div>
+				<div id="bottom_state"><!--底部状态栏-->
+					<div id="stateContent">
+						<ul class="stateContentL">
+							<li style="z-index: 8;" class="currentFont"><span class="fonts">上传队列</span><span></span></li>
+							<li style="z-index: 7;"><span class="fonts">下载队列</span><span></span></li>
+							<li style="z-index: 6;"><span class="fonts">错误日志</span><span></span></li>
+						</ul>
+						<!--<ul class="stateContentR right" style="margin-right: 50px;">
+							<li>上传速度：</li><span>{{uploadSpeed(updownlist.uploadSpeed)}}</span>
+							<li>下载速度：</li><span>{{uploadSpeed(updownlist.downloadSpeed)}}</span>
+						</ul>-->
+						<img @click="stateImg" id="stateImg" src="img/listUp.png"/><br />
+						<div id="displayQueue">
+							<div id="upListQueue">
+								<ul v-for="data in updownlist.uploadList" id="">
+									<li><img :src="data.iconPath"/></li>
+									<li>{{data.name}}</li>
+									<li>{{fileSize(data.size)}}</li>
+									<li>{{data.progress}}</li>
+									<li>{{uploadSpeed(updownlist.uploadSpeed)}}</li>
+									<li @click="updowndeletes(event)" class="queueDelete">×</li>
+								</ul>
+							</div>
+							<div id="downListQueue">
+								<!--测试队列-->
+								<ul v-for="data in updownlist.downloadList" id="">
+									<li><img src="img/document.png"/></li>
+									<li>{{data.name}}</li>
+									<li>{{fileSize(data.size)}}</li>
+									<li>{{data.time}}</li>
+									<li class="queueDelete">×</li>
+								</ul>
+							</div>
+							<div id="crossQueue"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		<template id="abouts">
+			<div id="mainbody_personal" v-if="personals">
+				<div id="userHead">
+					<span @click="userInfo" id="userInfo">个人信息</span>
+					<span @click="userPassword" id="userPassword">修改密码</span>
+					<span @click="userPhone" id="userPhone">修改电话</span>
+				</div>
+				<div id="userChangePassword">
+					<div>
+						<span>旧密码：</span>
+						<input style="" type="text" id="oldChangePasswords" value="" />
+					</div>
+					<div>
+						<span>新密码：</span>
+						<input style="" type="text" id="newChangePassword" value="" />
+					</div>
+					<div>
+						<span>重复新密码：</span>
+						<input style="" type="text" id="newChangePasswords" value="" />
+					</div>
+					<input type="button" @click="passwordModifys" id="passwordModifys" value="密码修改" />
+				</div>
+				<div id="userInformation">
+					<div>
+						<span>姓名：</span>
+						<input style="color: #8f8f8f;" type="text" disabled="disabled" v-model="username.name" value="" />
+					</div>
+					<div>
+						<span>性别：</span>
+						<input style="color: #8f8f8f;" type="text" disabled="disabled" v-model="username.sex" value="" />
+					</div>
+					<div>
+						<span>公司：</span>
+						<input style="color: #8f8f8f;" type="text" disabled="disabled" v-model="username.company" value="" />
+					</div>
+					<div>
+						<span>职位：</span>
+						<input type="text" id="userJob" v-model="username.job" value="" />
+					</div>
+					<div>
+						<span>注册日期：</span>
+						<input style="color: #8f8f8f;" type="text" disabled="disabled" v-model="username.createTime" value="" />
+					</div>
+					<div>
+						<span>邮箱：</span>
+						<input type="text" id="userEmail" v-model="username.email" value="" />
+					</div>
+					<div>
+						<span>QQ：</span>
+						<input type="text" v-model="username.qq" value="" />
+					</div>
+					<div>
+						<span>电话：</span>
+						<input type="text" style="color: #8f8f8f;" disabled="disabled" v-model="username.call" value="" />
+					</div>
+					<input type="button" @click="modifys" id="modify" value="修改" />
+				</div>
+				<div id="userChangePhone">
+					<div id="oldPhone">
+						<div style="margin-left: 30px;">
+							<span>电话：</span>
+							<input type="text" disabled="disabled" v-model="username.call" id="oldChangePhone" value="" />
+							<input type="button" id="oldChangePhoneNext" @click="oldChangePhoneNext" value="获取验证" style="padding: inherit; width: 95px; margin-left: 5px;"/>
+						</div>
+						<div style="margin-left: -91px;">
+							<span>验证码：</span>
+							<input style="" type="text" id="oldvalidatePhone" value="" />
+						</div>
+						<input type="button" @click="phoneModifys" id="phoneModifys" value="下一步" />
+					</div>
+					<div id="newPhone" style="display: none;">
+						
+					</div>
+				</div>
+			</div>
+		</template>
+		<template id="datas">
+			<div id="datas_content">
+				<div id="navigation" class="navigation" @click="divNav($event)">
+					<div id="">
+						<span @click="production_control">生产管理</span>
+						<ul>
+							<li>车间看板</li>
+							<li>机器群览</li>
+							<li>工艺参数监控</li>
+							<li>效能统计</li>
+							<li>效能统计图表</li>
+							<li>停机状态统计</li>
+							<li>生产任务</li>
+							<li>生产一致性</li>
+							<li>日生产任务</li>
+							<li>日生产报表</li>
+							<li>工作效率报表</li>
+							<li>生产报表</li>
+							<li>任务单统计</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="Order">订单与排程</span>
+						<ul>
+							<li>订单管理</li>
+							<li>自动排程</li>
+							<li>生产计划</li>
+							<li>机台负荷分析</li>
+							<li>物料需求统计</li>
+							<li>人员需求分析</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="plan_analysis">计划执行分析</span>
+						<ul>
+							<li>计划数量统计</li>
+							<li>暂停时间分析</li>
+							<li>时间偏差统计</li>
+							<li>机器人数据</li>
+							<li>机器人数据</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="materiel">物料管理</span>
+						<ul>
+							<li>物料入库</li>
+							<li>物料登记</li>
+							<li>物料统计</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="human_resource">人力资源管理</span>
+						<ul>
+							<li>员工档案</li>
+							<li>岗位档案</li>
+							<li>班次管理</li>
+							<li>考勤记录</li>
+							<li>员工计时表</li>
+							<li>计件补录</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="equipment">设备管理</span>
+						<ul>
+							<li>维保方案</li>
+							<li>维保任务</li>
+							<li>维保分析</li>
+							<li>考勤记录</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="mould">模具维护</span>
+						<ul>
+							<li>模具使用管理</li>
+							<li>模具维护方案</li>
+							<li>模具维护任务</li>
+							<li>模具维护分析</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="quality">质量管理</span>
+						<ul>
+							<li>工艺参数分析</li>
+							<li>不良品管理</li>
+							<li>不良品查询</li>
+							<li>检测记录查询</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="archives">档案管理</span>
+						<ul>
+							<li>机器档案</li>
+							<li>模具档案</li>
+							<li>用料档案</li>
+							<li>色粉档案</li>
+							<li>成品档案</li>
+							<li>胶件档案</li>
+						</ul>
+					</div>
+					<div id="">
+						<span @click="systems">系统管理</span>
+						<ul>
+							<li>权限管理</li>
+							<li>机器状态维护</li>
+							<li>不良品维护</li>
+							<li>工作日历</li>
+							<li>操作日志</li>
+						</ul>
+					</div>
+					<div id="navigation_back"></div>
+				</div>
+				<div id="navigation_content">
+					<div id="navigation_cubicle">
+						
+					</div>
+					<div id="robot_data" value="车间看板">
+						<div class="left_workshop">
+							<div class="production">
+								<p>生产汇总</p>
+								<span>当前订单数：</span><span>0</span><br />
+								<span>当日总开模数：</span><span>0</span><br />
+								<span>当日警告次数：</span><span>0</span><br />
+								<span>日总开工工时：</span><span>0</span><br />
+								<span>周总开工工时：</span><span>0</span><br />
+								<span>日机器效率：</span><span>0</span><br />
+								<span>周机器效率：</span><span>0</span>
+							</div><br>
+							<div class="orderTask">
+								<p>订单进度统计</p>
+								<span></span><span>时间进度</span>
+								<span></span><span>开模数</span>
+								<span></span><span>任务进度</span>
+							</div>
+						</div>
+						<div class="center_workshop">
+							
+						</div>
+						<div class="right_workshop">
+							<div class="robotRun">
+								<p>机器运行时间分布统计</p>
+								<span></span><span>有效</span>
+								<span></span><span>无效</span>
+								<span></span><span>其他</span>
+							</div><br />
+							<div>
+								<p>机器作业时间</p>
+							</div>
+						</div>
+					</div>
+					<div id="robot_ipot"></div>
+					<div id="robot_run"></div>
+					<div id="vision_template"></div>
+					<div id="vision_data"></div>
+					<div id="datas_err"></div>
+				</div>
+			</div>
+		</template>
+		<!--<template id="share">
+			
+		</template>-->
+		<script type="text/javascript">
+//			import Vue from 'vue'
+//			
+//			export default Vue.extend({
+//				props: ['logo']
+//			})
+		</script>
+		
+		<!--外部引入-->
+		<!--<script src="js/jquery-2.1.4.min.js" type="text/javascript" charset="utf-8"></script>-->
+		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script src="bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>-->
+		<script src="js/vue-router.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/oss.js" type="text/javascript" charset="utf-8"></script>
+		<script src="dist/js/vendor/jquery.min.js"></script>
+		<script src="dist/js/vendor/video.js"></script>
+	    <script src="dist/js/flat-ui.min.js"></script>
+	    <script src="dist/js/application.js"></script>
+		<!--公共数据与函数
+		<script src="js/global.js" type="text/javascript" charset="utf-8"></script>-->
+		<!---->
+		<script src="js/tcrMainbody.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/tcrHead.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/wholeEdit.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+//			3. 创建和挂载根实例。记得要通过 router 配置参数注入路由，从而让整个应用都有路由功能
+//	        const vm = new Vue({
+//	              router: router 
+//	        }).$mount('#App');
+		</script>
+		<!--公共数据与函数-->
+		
+		<script src="js/Routes.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/globalss.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/verification.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script type="text/javascript">
+			new Vue({
+				el:'#App',
+				data:function(){
+					return{
+						loginNoShow:false
+					}
+				}
+			});
+		</script>-->
+	</body>
+</html>

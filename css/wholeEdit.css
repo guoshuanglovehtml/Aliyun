@@ -1,0 +1,147 @@
+body,div,input,span,ul,ul,button,dd,dt,dl,p,button{
+	margin: 0;
+	padding: 0;
+}
+li{
+	list-style:none; 
+}
+.hide{
+	display: none;
+}
+.left{
+	float: left;
+}
+.right{
+	float: right;
+}
+a{
+	text-decoration:none;
+	color: white;
+}
+html{
+	height: 100%;
+}
+body{
+	height: 100%;
+	/*background: none!important;*/
+	background-color: #000;
+	
+}
+input { 
+	outline:none; 
+}
+input[type="text"],
+input[type="password"]{
+	color: white;
+    border: 2px solid transparent;
+    padding-left: 6px;
+    border-radius: 6px;
+    background: rgba(57,60,63,0.5);
+}
+::-webkit-input-placeholder { /* WebKit browsers */
+　　color:#a5a5a5;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+　　color:#a5a5a5;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+　　color:#a5a5a5;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+　　color:#a5a5a5;
+}
+/***********************************************************/
+#App{
+	width: 100%;
+	min-width: 828px;
+	height: 100%;
+}
+#tcrHead{
+    width: 100%;
+    min-width: 768px;
+    height: 66px;
+}
+#tcrMainbody{
+	width: 100%;
+    min-width: 768px;
+    height: calc(100% - 66px);
+}
+#myVerification{
+    position: relative;
+    top: 12px;
+    left: 15px;
+    cursor: pointer;
+}
+/*模糊处理*/
+.vague{
+    -webkit-filter: blur(15px);
+    -moz-filter: blur(15px);
+    -o-filter: blur(15px);
+    -ms-filter: blur(15px);
+    filter: blur(15px);
+}
+/*加载界面*/
+#preloading,#preloadingNull{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: rgba(0,0,0,0.4);
+	z-index: 10000;
+}
+#preloadingNull{
+	display: none;
+	background: none!important;
+	position: absolute;
+    margin-left: 12px;
+    line-height: 36px;
+}
+#preloading div,
+#preloadingNull div,
+#prompt_notice div{
+	width: 30%;
+    height: 150px;
+    position: absolute;
+    border: 2px solid rgba(0,0,0,0);
+    border-radius: 10px;
+    top: 35%;
+    left: 35%;
+    text-align: center;
+}
+#preloading div img,
+#preloadingNull div img{
+	width: 60px;
+}
+#preloading div p,
+#preloadingNull div p{
+	width: 100%;
+	color: #fff;
+	text-align: center;
+	margin-top: 10px;
+}
+#prompt_notice{
+	z-index: 500;
+	position: absolute;
+	display: none;
+	height: 100%;
+	width: 100%;
+	color: white;
+}
+#prompt_notice div{
+	background: rgba(0,0,0,0.9);
+	box-shadow: #24272b 0px 0px 14px;
+}
+#prompt_notice p{
+    font-size: 21px;
+    margin-top: 9%;
+}
+#prompt_notice input{
+    background: #34495E;
+    border: #34495E;
+    padding: 2px 14px;
+    border-radius: 8px;
+    margin-top: 4%;
+}
+
+

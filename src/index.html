@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/wholeEdit.css"/>
+		<link rel="stylesheet" type="text/css" href="css/tcrMainbody.css"/>
+		<link rel="stylesheet" type="text/css" href="css/tcrHeadbody.css"/>
+	</head>
+	<body>
+		<div id="App">
+			<tcr-head v-bind:message="loginState"></tcr-head>
+			<tcr-mainbody v-bind:message="loginState" v-bind:array="fileList"></tcr-mainbody>
+		</div>
+		<template id="headbody" class="hide">
+			<div id="headbody_content">
+				<div id="logo"  v-on:click="hhhh">
+					<img src="img/tcr_logo_white.png" style="display: inline-block;"/>
+				</div>
+				<div id="Modular"></div>
+				<div id="userinfo" v-if="personal">
+					<div id="userinfo_child"><img src="img/share.png"/>共享</div>
+					<div id="userinfo_set"><img src="img/set.png"/>设置</div>
+					<div id="userinfo_name" v-on:click="userName"><img src="img/user.png"/>admin</div>
+					<div id="userinfo_Logout" v-on:click="logout"><img src="img/quit.png"/>退出</div>
+				</div>
+			</div>
+		</template>
+		<template id="mainbody">
+			<div id="mainbody_content">
+				<div id="mainbody_login" v-if="!personal">
+					<div id="login_top">用户登录</div>
+					<div id="login_middle">
+						<div class="">
+							<span>用户名：</span>
+							<input type="text" v-model='loginName' />
+						</div>
+						<div class="">
+							<span>密码：</span>
+							<input type="text" v-model='loginPassword' />
+						</div>
+						<div class="">
+							<span>验证：</span>
+							<input type="text" v-model='code' value="" />
+						</div>
+						<div class="login_means">
+							<span>登录方式：</span>
+							<label>oss<input type="radio" v-model="loginType" value="oss"/></label>  
+							<label>location<input type="radio" v-model="loginType" value="location"/></label>  
+						</div>
+					</div>
+					<div id="login_bottom">
+						<input type="checkbox" name="" id="login_key" /> 
+						<span id="">记住密匙</span><br />
+						<input type="button" v-on:click="login" name=""value="登录" />
+						<input type="button" v-on:click="logout" value="退出" />
+						<input type="button" v-on:click="test" value="修改" />
+						<input type="button" v-on:click="forget" style="width: 70px;" value="忘记密码" />
+					</div>
+				</div>
+				<div id="mainbody_look" v-if="personal" >
+					<div id="mainbody_function">
+						<ul>
+							<li id="function_retreat"><img src="img/left.png"/></li>
+							<li id="function_forward"><img src="img/right.png"/></li>
+							<li id="function_upward" v-on:click="upfile"><img src="img/top.png"/></li>
+							<li id="function_refresh"><img src="img/new.png"/></li>
+							<li id="function_homepage"><img src="img/homepage.png"/></li>
+							<li><input v-model="address()" id="function_address" value="" /></li>
+							<li id="function_enter" v-on:click="jumpAddress"><img src="img/enter.png"/></li>
+							<li id="function_collect"><img src="img/stars.png"/></li>
+						</ul>
+					</div>
+					<div id="mainbody_operation">
+						<ul>
+							<li id="operation_upload" v-on:click="upload"><img src="img/upload.png"/>上传</li>
+							<li id="operation_new" v-on:click="newfile"><img src="img/upload.png"/>新建目录</li>
+							<li id="operation_select">全选</li>
+							<li id="operation_download"><img src="img/download.png"/>下载</li>
+							<li id="operation_copy"><img src="img/copy.png"/>复制</li>
+							<li id="operation_open" v-on:click="openFile"><img src="img/copy.png"/>打开</li>
+							<li id="operation_many" v-on:click="manyShow">更多<img src="img/option.png"/></li>
+						</ul>
+						<div id="operation_manys" v-if="manyshow">
+							<div id="operation_delete" v-on:click="deletes">删除</div>
+							<div id="operation_paste">粘贴</div>
+							<div id="operation_newName">重命名</div>
+							<div id="operation_share">共享</div>
+						</div>
+					</div>
+					<div id="mainbody_file">
+						<ul>
+							<li v-for="(data,keys,index) in arrays " class="cdk" v-on:dblclick="openFile" v-on:click="choose(keys,data)"  v-bind:class='{isblue:keys==qwert}' ><img :src="data.iconPath" alt="" /><span>{{data.name}}</span><input type="checkbox" value="" /><br /><span>{{data.type}}</span></li>
+							<!--<li class="cdk">
+								<img src="img/homepage.png" alt="" />
+								<span>{{arrays}}</span><input type="checkbox" name="" id="" value="" /><br />
+								<span>文件夹</span>
+							</li>-->
+						</ul>
+					</div>
+				</div>
+			</div>
+		</template>
+		<script type="text/javascript">
+//			import Vue from 'vue'
+//			
+//			export default Vue.extend({
+//				props: ['logo']
+//			})
+		</script>
+		
+		<!--外部引入-->
+		<!--<script src="js/jquery-2.1.4.min.js" type="text/javascript" charset="utf-8"></script>-->
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/oss.js" type="text/javascript" charset="utf-8"></script>
+		<!--公共数据与函数
+		<script src="js/global.js" type="text/javascript" charset="utf-8"></script>-->
+		<!---->
+		<script src="js/tcrMainbody.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/tcrHead.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/wholeEdit.js" type="text/javascript" charset="utf-8"></script>
+		
+		<!--公共数据与函数-->
+		<script src="js/globals.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script type="text/javascript">
+			new Vue({
+				el:'#App',
+				data:function(){
+					return{
+						loginNoShow:false
+					}
+				}
+			});
+		</script>-->
+	</body>
+</html>

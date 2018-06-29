@@ -1,0 +1,69 @@
+#headbody_content{
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	margin: 0 auto;
+	position: relative;
+}
+#headbody_operation button{
+    padding: 12px 29px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #8f8f8f;
+}
+#userinfo_login{
+	height: 100%;
+    position: absolute;
+    left: 902px;
+    line-height: 68px;
+    font-size: 22px;
+    color: white;
+}
+#userinfo_Logout>a{
+	cursor:pointer
+}
+#userinfo{
+    height: 100%;
+    float: right;
+}
+#logo>img{
+    height: 30px;
+    position: absolute;
+    margin: 18px 2px 2px 29px;
+}
+#userinfo>div{
+	float: left;
+	padding: 17.5px 0px;
+    color: white;
+}
+#userinfo>div>a,
+#userinfo>div:nth-child(1),
+#userinfo>div:nth-child(2){
+	padding: 17.5px 26px;
+}
+#userinfo img{
+	width: 30px;
+    padding-right: 3px;
+    vertical-align: middle;
+    position: relative;
+    top: -2px;
+}
+#userinfo_file>div>a{
+	background: #16a085;
+}
+#Modular{
+    position: absolute;
+    left: 174px;
+}
+#Modular>div{
+    font-size: 20px;
+    float: left;
+    padding: 16px 0px;
+    color: white;
+}
+#Modular>div>a{
+    padding: 27px 38px;
+}
+
+
+
